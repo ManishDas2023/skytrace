@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 
-const OPENSKY_URL =
-  "https://manishdas317%40gmail.com-api-client:LZ2TMSuxu6ADqJzFnf7Uq6Gl1LGEaw0p@opensky-network.org/api/states/all?lamin=6&lomin=68&lamax=37&lomax=97";
+const OPENSKY_URL = "https://opensky-network.org/api/states/all?lamin=6&lomin=68&lamax=37&lomax=97";
+const OPENSKY_AUTH = "Basic " + btoa("manishdas317@gmail.com-api-client:LZ2TMSuxu6ADqJzFnf7Uq6Gl1LGEaw0p");
 
 function parseState(s) {
   const vel = s[9] ? Math.round(s[9] * 3.6) : null;
@@ -257,7 +257,7 @@ export default function App() {
     setLoading(true);
     setApiError(null);
     try {
-      const res = await fetch(OPENSKY_URL, { signal: AbortSignal.timeout(10000) });
+      const res = await fetch(OPENSKY_URL, { signal: AbortSignal.timeout(10000),headers:{ "Authorization": OPENSKY_AUTH }});
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       const parsed = (data.states || []).map(parseState).filter(f => f.callsign !== "UNKNOWN" && f.lat && f.lon);
