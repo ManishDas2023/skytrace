@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 const OPENSKY_URL =
   "https://opensky-network.org/api/states/all?lamin=6&lomin=68&lamax=37&lomax=97";
@@ -14,9 +14,8 @@ function parseState(s) {
     lon: s[5],
     lat: s[6],
     altitude: alt ? `${(alt * 3.281).toLocaleString()} ft` : "—",
-    altMetres: alt,
     speed: vel ? `${vel} km/h` : "—",
-    heading: s[10] ? Math.round(s[10]) : null,
+    heading: s[10] ? Math.round(s[10]) : 0,
     onGround: s[8],
   };
 }
@@ -28,21 +27,13 @@ function guessAirline(callsign) {
     G8: "GoFirst ⚪", EK: "Emirates 🔷", QR: "Qatar Airways 🟤",
     SQ: "Singapore Air 🔶", BA: "British Airways 🇬🇧", LH: "Lufthansa 🔵",
   };
-  const prefix = callsign.slice(0, 2);
-  return map[prefix] || callsign.slice(0, 2) + " Airlines";
+  return map[callsign.slice(0, 2)] || callsign.slice(0, 2) + " Airlines";
 }
 
-// LocalStorage-based DB (works in real browsers, unlike artifacts)
 const DB = {
-  getSaved: () => {
-    try { return JSON.parse(localStorage.getItem("skytrace-saved") || "[]"); } catch { return []; }
-  },
-  setSaved: (ids) => {
-    try { localStorage.setItem("skytrace-saved", JSON.stringify(ids)); } catch {}
-  },
-  getHistory: () => {
-    try { return JSON.parse(localStorage.getItem("skytrace-history") || "[]"); } catch { return []; }
-  },
+  getSaved: () => { try { return JSON.parse(localStorage.getItem("skytrace-saved") || "[]"); } catch { return []; } },
+  setSaved: (ids) => { try { localStorage.setItem("skytrace-saved", JSON.stringify(ids)); } catch {} },
+  getHistory: () => { try { return JSON.parse(localStorage.getItem("skytrace-history") || "[]"); } catch { return []; } },
   addHistory: (flight) => {
     try {
       const h = DB.getHistory();
@@ -56,6 +47,7 @@ const DB = {
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+  @import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   :root{
     --sky:#0D1B2A;--panel:#111927;--card:#162032;--border:rgba(255,255,255,0.07);
@@ -101,6 +93,23 @@ const css = `
   .fc-stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;}
   .fc-stat-val{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--white);}
   .fc-country{margin-left:auto;font-size:11px;color:var(--muted);align-self:flex-end;}
+
+  /* MAP */
+  .map-container{margin:0 20px 16px;border-radius:18px;overflow:hidden;border:1px solid var(--border);position:relative;}
+  .map-wrap{height:320px;width:100%;}
+  .map-info{background:var(--card);padding:10px 14px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px;}
+  .map-count{color:var(--cyan);font-weight:600;}
+  .leaflet-container{background:#0D1B2A !important;}
+  .plane-icon{font-size:16px;line-height:1;display:inline-block;}
+
+  /* POPUP */
+  .leaflet-popup-content-wrapper{background:var(--card)!important;border:1px solid var(--border)!important;border-radius:14px!important;box-shadow:0 8px 32px rgba(0,0,0,0.4)!important;color:var(--white)!important;}
+  .leaflet-popup-tip{background:var(--card)!important;}
+  .leaflet-popup-content{margin:12px 16px!important;font-family:'Space Grotesk',sans-serif!important;}
+  .popup-callsign{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--white);margin-bottom:6px;}
+  .popup-row{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:3px;}
+  .popup-val{color:var(--cyan);font-weight:600;}
+
   .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:40;backdrop-filter:blur(3px);}
   .detail-panel{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#0f1e30;border-top:1px solid var(--border);border-radius:24px 24px 0 0;padding:20px 20px 36px;z-index:50;animation:slideUp .3s ease;}
   @keyframes slideUp{from{transform:translateX(-50%) translateY(100%)}to{transform:translateX(-50%) translateY(0)}}
@@ -132,6 +141,104 @@ const css = `
   .err-card{margin:0 20px 16px;background:rgba(248,113,113,0.07);border:1px solid rgba(248,113,113,0.2);border-radius:16px;padding:14px 16px;font-size:12px;color:var(--red);line-height:1.7;}
   .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--green);color:#000;padding:10px 20px;border-radius:30px;font-size:13px;font-weight:700;pointer-events:none;z-index:200;white-space:nowrap;transition:all .3s;}
 `;
+
+// ── MAP COMPONENT ─────────────────────────────────────────────
+function LiveMap({ flights, onSelect }) {
+  const mapRef = useRef(null);
+  const leafletMap = useRef(null);
+  const markersRef = useRef({});
+
+  useEffect(() => {
+    // Load Leaflet dynamically
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+    document.head.appendChild(link);
+
+    const script = document.createElement("script");
+    script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+    script.onload = () => {
+      if (!mapRef.current || leafletMap.current) return;
+      const L = window.L;
+      const map = L.map(mapRef.current, {
+        center: [20.5937, 78.9629], // India center
+        zoom: 5,
+        zoomControl: true,
+        attributionControl: false,
+      });
+
+      // Dark tile layer
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+        maxZoom: 19,
+      }).addTo(map);
+
+      leafletMap.current = map;
+    };
+    document.head.appendChild(script);
+
+    return () => {
+      if (leafletMap.current) {
+        leafletMap.current.remove();
+        leafletMap.current = null;
+      }
+    };
+  }, []);
+
+  // Update markers when flights change
+  useEffect(() => {
+    const L = window.L;
+    if (!leafletMap.current || !L) return;
+
+    const map = leafletMap.current;
+    const currentIds = new Set(flights.map(f => f.icao24));
+
+    // Remove old markers
+    Object.keys(markersRef.current).forEach(id => {
+      if (!currentIds.has(id)) {
+        map.removeLayer(markersRef.current[id]);
+        delete markersRef.current[id];
+      }
+    });
+
+    // Add/update markers
+    flights.filter(f => f.lat && f.lon && !f.onGround).forEach(f => {
+      const icon = L.divIcon({
+        html: `<div style="font-size:18px;transform:rotate(${f.heading || 0}deg);display:inline-block;filter:drop-shadow(0 0 4px #22D3EE)">✈</div>`,
+        className: "",
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+      });
+
+      const popup = `
+        <div class="popup-callsign">${f.callsign}</div>
+        <div class="popup-row"><span>Altitude</span><span class="popup-val">${f.altitude}</span></div>
+        <div class="popup-row"><span>Speed</span><span class="popup-val">${f.speed}</span></div>
+        <div class="popup-row"><span>Country</span><span class="popup-val">${f.country || "—"}</span></div>
+      `;
+
+      if (markersRef.current[f.icao24]) {
+        markersRef.current[f.icao24].setLatLng([f.lat, f.lon]);
+        markersRef.current[f.icao24].setIcon(icon);
+      } else {
+        const marker = L.marker([f.lat, f.lon], { icon })
+          .addTo(map)
+          .bindPopup(popup, { maxWidth: 200 })
+          .on("click", () => onSelect(f));
+        markersRef.current[f.icao24] = marker;
+      }
+    });
+  }, [flights]);
+
+  return (
+    <div className="map-container">
+      <div ref={mapRef} className="map-wrap" />
+      <div className="map-info">
+        <span>✈</span>
+        <span><span className="map-count">{flights.filter(f => !f.onGround).length}</span> aircraft in air over India · tap any plane</span>
+      </div>
+    </div>
+  );
+}
 
 export default function App() {
   const [flights, setFlights]     = useState([]);
@@ -249,6 +356,7 @@ export default function App() {
           </div>
         </div>
 
+        {/* ── TRACK TAB ── */}
         {activeTab === "track" && (
           <>
             <div className="stats-row">
@@ -262,6 +370,21 @@ export default function App() {
           </>
         )}
 
+        {/* ── MAP TAB ── */}
+        {activeTab === "map" && (
+          <>
+            <div className="sec-label" style={{ paddingTop: 8 }}>Live Map · India</div>
+            {flights.length === 0 ? (
+              <div className="empty-state"><div className="empty-icon">🗺️</div>Loading map data…<br /><span style={{ color: "var(--cyan)", cursor: "pointer", fontSize: 12 }} onClick={fetchFlights}>Tap to refresh</span></div>
+            ) : (
+              <LiveMap flights={flights} onSelect={openDetail} />
+            )}
+            <div className="sec-label">In Air ({inAir})</div>
+            {flights.filter(f => !f.onGround).slice(0, 5).map(f => <FlightCard key={f.icao24} f={f} />)}
+          </>
+        )}
+
+        {/* ── SAVED TAB ── */}
         {activeTab === "saved" && (
           <>
             <div className="sec-label" style={{ paddingTop: 8 }}>Tracked ({saved.length})</div>
@@ -269,6 +392,7 @@ export default function App() {
           </>
         )}
 
+        {/* ── HISTORY TAB ── */}
         {activeTab === "history" && (
           <>
             <div className="sec-label" style={{ paddingTop: 8 }}>Recently Viewed ({history.length})</div>
@@ -285,7 +409,12 @@ export default function App() {
         <div style={{ height: 20 }} />
 
         <div className="bottom-nav">
-          {[{ id: "track", ico: "✈️", txt: "Live" }, { id: "saved", ico: "⭐", txt: "Saved", badge: savedIds.length || null }, { id: "history", ico: "🕐", txt: "History" }].map(n => (
+          {[
+            { id: "track", ico: "✈️", txt: "Live" },
+            { id: "map",   ico: "🗺️", txt: "Map"  },
+            { id: "saved", ico: "⭐", txt: "Saved", badge: savedIds.length || null },
+            { id: "history", ico: "🕐", txt: "History" },
+          ].map(n => (
             <div key={n.id} className={`nav-btn ${activeTab === n.id ? "active" : ""}`} onClick={() => setActiveTab(n.id)}>
               <div className="nav-ico">{n.ico}</div>
               <div className="nav-txt">{n.txt}</div>
