@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 
 const OPENSKY_URL =
-  "https://opensky-network.org/api/states/all?lamin=6&lomin=68&lamax=37&lomax=97";
+  "https://manishdas317%40gmail.com-api-client:LZ2TMSuxu6ADqJzFnf7Uq6Gl1LGEaw0p@opensky-network.org/api/states/all?lamin=6&lomin=68&lamax=37&lomax=97";
 
 function parseState(s) {
   const vel = s[9] ? Math.round(s[9] * 3.6) : null;
