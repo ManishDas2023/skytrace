@@ -15,25 +15,76 @@ const AIRPORTS = {
   BBI:{lat:20.2444,lon:85.8178,city:"Bhubaneswar"},GAU:{lat:26.1061,lon:91.5859,city:"Guwahati"},
   IXB:{lat:26.6812,lon:88.3286,city:"Bagdogra"},PAT:{lat:25.5913,lon:85.0880,city:"Patna"},
   SXR:{lat:33.9871,lon:74.7742,city:"Srinagar"},VNS:{lat:25.4524,lon:82.8593,city:"Varanasi"},
-  // International
-  DXB:{lat:25.2532,lon:55.3657,city:"Dubai"},LHR:{lat:51.4700,lon:-0.4543,city:"London"},
-  JFK:{lat:40.6413,lon:-73.7781,city:"New York"},SIN:{lat:1.3644,lon:103.9915,city:"Singapore"},
-  BKK:{lat:13.6811,lon:100.7472,city:"Bangkok"},KUL:{lat:2.7456,lon:101.7099,city:"Kuala Lumpur"},
-  HKG:{lat:22.3080,lon:113.9185,city:"Hong Kong"},NRT:{lat:35.7720,lon:140.3929,city:"Tokyo"},
-  SYD:{lat:-33.9461,lon:151.1772,city:"Sydney"},CDG:{lat:49.0097,lon:2.5479,city:"Paris"},
-  FRA:{lat:50.0379,lon:8.5622,city:"Frankfurt"},AMS:{lat:52.3086,lon:4.7639,city:"Amsterdam"},
-  DOH:{lat:25.2731,lon:51.6080,city:"Doha"},AUH:{lat:24.4330,lon:54.6511,city:"Abu Dhabi"},
+  UDR:{lat:24.6177,lon:73.8961,city:"Udaipur"},IXJ:{lat:32.6891,lon:74.8374,city:"Jammu"},
+  TRV:{lat:8.4821,lon:76.9201,city:"Thiruvananthapuram"},IXM:{lat:9.8345,lon:78.0934,city:"Madurai"},
+  VGA:{lat:16.5304,lon:80.7968,city:"Vijayawada"},RPR:{lat:21.1804,lon:81.7388,city:"Raipur"},
+  NAG:{lat:21.0922,lon:79.0472,city:"Nagpur"},IDR:{lat:22.7218,lon:75.8011,city:"Indore"},
+  // Middle East
+  DXB:{lat:25.2532,lon:55.3657,city:"Dubai"},AUH:{lat:24.4330,lon:54.6511,city:"Abu Dhabi"},
+  DOH:{lat:25.2731,lon:51.6080,city:"Doha"},RUH:{lat:24.9578,lon:46.6989,city:"Riyadh"},
+  JED:{lat:21.6796,lon:39.1565,city:"Jeddah"},MCT:{lat:23.5933,lon:58.2844,city:"Muscat"},
+  KWI:{lat:29.2266,lon:47.9689,city:"Kuwait"},BAH:{lat:26.2708,lon:50.6336,city:"Bahrain"},
+  AMM:{lat:31.7226,lon:35.9932,city:"Amman"},BEY:{lat:33.8209,lon:35.4884,city:"Beirut"},
+  // Europe
+  LHR:{lat:51.4700,lon:-0.4543,city:"London"},LGW:{lat:51.1537,lon:-0.1821,city:"London Gatwick"},
+  CDG:{lat:49.0097,lon:2.5479,city:"Paris"},ORY:{lat:48.7233,lon:2.3794,city:"Paris Orly"},
+  FRA:{lat:50.0379,lon:8.5622,city:"Frankfurt"},MUC:{lat:48.3537,lon:11.7750,city:"Munich"},
+  AMS:{lat:52.3086,lon:4.7639,city:"Amsterdam"},BRU:{lat:50.9014,lon:4.4844,city:"Brussels"},
+  MAD:{lat:40.4936,lon:-3.5668,city:"Madrid"},BCN:{lat:41.2974,lon:2.0833,city:"Barcelona"},
+  FCO:{lat:41.8003,lon:12.2389,city:"Rome"},MXP:{lat:45.6306,lon:8.7281,city:"Milan"},
+  ZRH:{lat:47.4647,lon:8.5492,city:"Zurich"},VIE:{lat:48.1103,lon:16.5697,city:"Vienna"},
+  CPH:{lat:55.6180,lon:12.6508,city:"Copenhagen"},ARN:{lat:59.6519,lon:17.9186,city:"Stockholm"},
+  OSL:{lat:60.1939,lon:11.1004,city:"Oslo"},HEL:{lat:60.3172,lon:24.9633,city:"Helsinki"},
+  ATH:{lat:37.9364,lon:23.9445,city:"Athens"},IST:{lat:41.2608,lon:28.7418,city:"Istanbul"},
+  WAW:{lat:52.1657,lon:20.9671,city:"Warsaw"},PRG:{lat:50.1008,lon:14.2600,city:"Prague"},
+  BUD:{lat:47.4298,lon:19.2611,city:"Budapest"},LIS:{lat:38.7813,lon:-9.1359,city:"Lisbon"},
+  // Asia Pacific
+  SIN:{lat:1.3644,lon:103.9915,city:"Singapore"},BKK:{lat:13.6811,lon:100.7472,city:"Bangkok"},
+  KUL:{lat:2.7456,lon:101.7099,city:"Kuala Lumpur"},HKG:{lat:22.3080,lon:113.9185,city:"Hong Kong"},
+  NRT:{lat:35.7720,lon:140.3929,city:"Tokyo"},HND:{lat:35.5494,lon:139.7798,city:"Tokyo Haneda"},
+  KIX:{lat:34.4272,lon:135.2440,city:"Osaka"},ICN:{lat:37.4602,lon:126.4407,city:"Seoul"},
+  PVG:{lat:31.1443,lon:121.8083,city:"Shanghai"},PEK:{lat:40.0799,lon:116.6031,city:"Beijing"},
+  CAN:{lat:23.3924,lon:113.2988,city:"Guangzhou"},SZX:{lat:22.6393,lon:113.8107,city:"Shenzhen"},
+  TPE:{lat:25.0797,lon:121.2342,city:"Taipei"},MNL:{lat:14.5086,lon:121.0197,city:"Manila"},
+  CGK:{lat:-6.1256,lon:106.6559,city:"Jakarta"},DPS:{lat:-8.7482,lon:115.1672,city:"Bali"},
+  SGN:{lat:10.8188,lon:106.6520,city:"Ho Chi Minh"},HAN:{lat:21.2212,lon:105.8072,city:"Hanoi"},
+  DAD:{lat:16.0439,lon:108.1992,city:"Da Nang"},RGN:{lat:16.9073,lon:96.1332,city:"Yangon"},
   CMB:{lat:7.1808,lon:79.8841,city:"Colombo"},DAC:{lat:23.8433,lon:90.3978,city:"Dhaka"},
   KTM:{lat:27.6966,lon:85.3591,city:"Kathmandu"},MLE:{lat:4.1918,lon:73.5290,city:"Maldives"},
+  TAS:{lat:41.2579,lon:69.2812,city:"Tashkent"},ALA:{lat:43.3521,lon:77.0405,city:"Almaty"},
+  // Australia
+  SYD:{lat:-33.9461,lon:151.1772,city:"Sydney"},MEL:{lat:-37.6690,lon:144.8410,city:"Melbourne"},
+  BNE:{lat:-27.3842,lon:153.1175,city:"Brisbane"},PER:{lat:-31.9403,lon:115.9670,city:"Perth"},
+  ADL:{lat:-34.9450,lon:138.5306,city:"Adelaide"},CBR:{lat:-35.3069,lon:149.1950,city:"Canberra"},
+  DRW:{lat:-12.4147,lon:130.8765,city:"Darwin"},HBA:{lat:-42.8361,lon:147.5078,city:"Hobart"},
+  OOL:{lat:-28.1644,lon:153.5044,city:"Gold Coast"},CNS:{lat:-16.8858,lon:145.7452,city:"Cairns"},
+  TSV:{lat:-19.2525,lon:146.7650,city:"Townsville"},MKY:{lat:-21.1717,lon:149.1797,city:"Mackay"},
+  ROK:{lat:-23.3819,lon:150.4753,city:"Rockhampton"},NTL:{lat:-32.7950,lon:151.8342,city:"Newcastle"},
+  // Africa
+  JNB:{lat:-26.1392,lon:28.2460,city:"Johannesburg"},CPT:{lat:-33.9715,lon:18.6021,city:"Cape Town"},
+  NBO:{lat:-1.3192,lon:36.9275,city:"Nairobi"},ADD:{lat:8.9779,lon:38.7993,city:"Addis Ababa"},
+  LOS:{lat:6.5774,lon:3.3214,city:"Lagos"},ACC:{lat:5.6052,lon:-0.1668,city:"Accra"},
+  CAI:{lat:30.1219,lon:31.4056,city:"Cairo"},CMN:{lat:33.3675,lon:-7.5898,city:"Casablanca"},
+  TUN:{lat:36.8510,lon:10.2272,city:"Tunis"},ALG:{lat:36.6910,lon:3.2154,city:"Algiers"},
+  DAR:{lat:-6.8781,lon:39.2026,city:"Dar es Salaam"},EBB:{lat:0.0424,lon:32.4435,city:"Entebbe"},
+  LLW:{lat:-13.7894,lon:33.7814,city:"Lilongwe"},BLZ:{lat:-15.6791,lon:34.9175,city:"Blantyre"},
+  LUN:{lat:-15.3308,lon:28.4526,city:"Lusaka"},HRE:{lat:-17.9318,lon:31.0928,city:"Harare"},
+  MRU:{lat:-20.4302,lon:57.6836,city:"Mauritius"},RUN:{lat:-20.8871,lon:55.5103,city:"Reunion"},
+  // Americas
+  JFK:{lat:40.6413,lon:-73.7781,city:"New York"},EWR:{lat:40.6895,lon:-74.1745,city:"Newark"},
   LAX:{lat:33.9425,lon:-118.4081,city:"Los Angeles"},ORD:{lat:41.9742,lon:-87.9073,city:"Chicago"},
-  TSV:{lat:-19.2525,lon:146.7650,city:"Townsville"},BNE:{lat:-27.3842,lon:153.1175,city:"Brisbane"},
-  AKL:{lat:-37.0082,lon:174.7850,city:"Auckland"},MEL:{lat:-37.6690,lon:144.8410,city:"Melbourne"},
-  PER:{lat:-31.9403,lon:115.9670,city:"Perth"},ICN:{lat:37.4602,lon:126.4407,city:"Seoul"},
-  PVG:{lat:31.1443,lon:121.8083,city:"Shanghai"},PEK:{lat:40.0799,lon:116.6031,city:"Beijing"},
-  IST:{lat:41.2608,lon:28.7418,city:"Istanbul"},CAI:{lat:30.1219,lon:31.4056,city:"Cairo"},
-  JNB:{lat:-26.1392,lon:28.2460,city:"Johannesburg"},NBO:{lat:-1.3192,lon:36.9275,city:"Nairobi"},
-  GRU:{lat:-23.4356,lon:-46.4731,city:"São Paulo"},YYZ:{lat:43.6772,lon:-79.6306,city:"Toronto"},
-  SFO:{lat:37.6213,lon:-122.3790,city:"San Francisco"},
+  SFO:{lat:37.6213,lon:-122.3790,city:"San Francisco"},MIA:{lat:25.7959,lon:-80.2870,city:"Miami"},
+  DFW:{lat:32.8998,lon:-97.0403,city:"Dallas"},ATL:{lat:33.6407,lon:-84.4277,city:"Atlanta"},
+  BOS:{lat:42.3656,lon:-71.0096,city:"Boston"},SEA:{lat:47.4502,lon:-122.3088,city:"Seattle"},
+  YYZ:{lat:43.6772,lon:-79.6306,city:"Toronto"},YVR:{lat:49.1967,lon:-123.1815,city:"Vancouver"},
+  YUL:{lat:45.4706,lon:-73.7408,city:"Montreal"},GRU:{lat:-23.4356,lon:-46.4731,city:"São Paulo"},
+  GIG:{lat:-22.8100,lon:-43.2506,city:"Rio de Janeiro"},EZE:{lat:-34.8222,lon:-58.5358,city:"Buenos Aires"},
+  SCL:{lat:-33.3930,lon:-70.7858,city:"Santiago"},BOG:{lat:4.7016,lon:-74.1469,city:"Bogotá"},
+  MEX:{lat:19.4363,lon:-99.0721,city:"Mexico City"},CUN:{lat:21.0366,lon:-86.8770,city:"Cancun"},
+  LIM:{lat:-12.0219,lon:-77.1143,city:"Lima"},UIO:{lat:-0.1292,lon:-78.3575,city:"Quito"},
+  // New Zealand
+  AKL:{lat:-37.0082,lon:174.7850,city:"Auckland"},CHC:{lat:-43.4894,lon:172.5322,city:"Christchurch"},
+  WLG:{lat:-41.3272,lon:174.8050,city:"Wellington"},ZQN:{lat:-45.0211,lon:168.7392,city:"Queenstown"},
 };
 
 function getCoords(iata) {
@@ -192,13 +243,16 @@ function LiveMap({ flights, onSelect, focusFlight }) {
         .addTo(map)
         .bindTooltip(`🛬 ${f.toCode} — ${arr.city}`, { permanent: false, direction: "top" });
 
-      // Plane marker (only for active/scheduled with progress)
-      if (f.status === "active" || (f.status === "scheduled" && progress > 0)) {
+      // Plane marker — show for ALL flights at correct position
+      const planePos = f.status === "landed" ? { lat: arr.lat, lon: arr.lon } : progress <= 0 ? { lat: dep.lat, lon: dep.lon } : pos;
+      const planeColor = f.status === "active" ? "#22D3EE" : f.status === "landed" ? "#3B82F6" : "#FBBF24";
+      const planeSize = f.status === "active" ? "20px" : "14px";
+      if (planePos) {
         const planeIcon = L.divIcon({
-          html: `<div style="font-size:18px;filter:drop-shadow(0 0 6px #22D3EE);cursor:pointer" title="${f.callsign}">✈</div>`,
+          html: `<div style="font-size:${planeSize};filter:drop-shadow(0 0 5px ${planeColor});cursor:pointer;color:${planeColor}" title="${f.callsign}">✈</div>`,
           className: "", iconSize: [20, 20], iconAnchor: [10, 10],
         });
-        const plane = L.marker([pos.lat, pos.lon], { icon: planeIcon })
+        const plane = L.marker([planePos.lat, planePos.lon], { icon: planeIcon })
           .addTo(map)
           .bindPopup(`
             <div style="font-family:monospace;font-size:13px;font-weight:700;color:#fff;margin-bottom:6px">${f.callsign}</div>
@@ -346,7 +400,7 @@ export default function App() {
   const [loading, setLoading]       = useState(false);
   const [apiError, setApiError]     = useState(null);
   const [lastFetch, setLastFetch]   = useState(null);
-  const [countdown, setCountdown]   = useState(60);
+  const [countdown, setCountdown]   = useState(900);
   const [query, setQuery]           = useState("");
   const [activeTab, setActiveTab]   = useState("track");
   const [selected, setSelected]     = useState(null);
@@ -366,7 +420,7 @@ export default function App() {
       const parsed = (data.data || []).map(parseAviationStack).filter(f => f.callsign !== "UNKNOWN");
       setFlights(parsed);
       setLastFetch(new Date());
-      setCountdown(60);
+      setCountdown(900);
     } catch (err) {
       setApiError(err.message || "Network error");
     } finally {
@@ -376,7 +430,7 @@ export default function App() {
 
   useEffect(() => { fetchFlights(); }, []);
   useEffect(() => {
-    const t = setInterval(() => setCountdown(c => { if (c <= 1) { fetchFlights(); return 60; } return c - 1; }), 1000);
+    const t = setInterval(() => setCountdown(c => { if (c <= 1) { fetchFlights(); return 900; } return c - 1; }), 1000);
     return () => clearInterval(t);
   }, [fetchFlights]);
 
